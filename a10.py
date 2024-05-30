@@ -112,6 +112,63 @@ def get_birth_date(name: str) -> str:
     return match.group("birth")
 
 
+def get_draft_pick(name: str) -> str:
+    """Gets draft pick of the given person
+
+    Args:
+        name - name of the person
+
+    Returns:
+        draft pick of the given person
+    """
+    infobox_text = clean_text(get_first_infobox_text(get_page_html(name)))
+    pattern = r"(?:NBA draft\D*)(?P<round>\d{1})"
+    error_text = (
+        "Page infobox has no draft pick information"
+    )
+    match = get_match(infobox_text, pattern, error_text)
+
+    return match.group("draft pick")
+
+
+def get_high_school(name: str) -> str:
+    """Gets high school of the given person
+
+    Args:
+        name - name of the person
+
+    Returns:
+        high school of the given person
+    """
+    infobox_text = clean_text(get_first_infobox_text(get_page_html(name)))
+    pattern = r"(?:(High School\(s\)|High School|High School))(?P<High School>.*?)(?College)"
+    error_text = (
+        "Page infobox has no high school information"
+    )
+    match = get_match(infobox_text, pattern, error_text)
+
+    return match.group("high school")
+
+
+def get_height(name: str) -> str:
+    """Gets height of the given person
+
+    Args:
+        name - name of the person
+
+    Returns:
+        height of the given person
+    """
+    infobox_text = clean_text(get_first_infobox_text(get_page_html(name)))
+    pattern = r"(?:Listed Height)"
+    error_text = (
+        "Page infobox has no high school information"
+    )
+    match = get_match(infobox_text, pattern, error_text)
+
+    return match.group("height")
+
+
 # below are a set of actions. Each takes a list argument and returns a list of answers
 # according to the action and the argument. It is important that each function returns a
 # list of the answer(s) and not just the answer itself.
@@ -141,6 +198,42 @@ def polar_radius(matches: List[str]) -> List[str]:
     return [get_polar_radius(matches[0])]
 
 
+def draft_pick(matches: List[str]) -> List[str]:
+    """Returns draft pick of named person in matches
+
+    Args:
+        matches - match from pattern of person's name to find birth date of
+
+    Returns:
+        draft pick of named person
+    """
+    return [get_draft_pick(matches[0])]
+
+
+def high_school(matches: List[str]) -> List[str]:
+    """Returns high school of named person in matches
+
+    Args:
+        matches - match from pattern of person's name to find birth date of
+
+    Returns:
+        high school of named person
+    """
+    return [get_high_school(matches[0])]
+
+
+def height(matches: List[str]) -> List[str]:
+    """Returns height of named person in matches
+
+    Args:
+        matches - match from pattern of person's name to find birth date of
+
+    Returns:
+        height of named person
+    """
+    return [get_height(matches[0])]
+
+
 # dummy argument is ignored and doesn't matter
 def bye_action(dummy: List[str]) -> None:
     raise KeyboardInterrupt
@@ -155,7 +248,16 @@ Action = Callable[[List[str]], List[Any]]
 # here, after all of the function definitions
 pa_list: List[Tuple[Pattern, Action]] = [
     ("when was % born".split(), birth_date),
+
     ("what is the polar radius of %".split(), polar_radius),
+
+    ("when was % drafted".split(), draft_pick),
+
+    ("where did % go to high school".split(), high_school),
+
+    ("% height".split(), height),
+    ("What is the height of %".split(), height),
+
     (["bye"], bye_action),
 ]
 
