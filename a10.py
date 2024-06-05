@@ -103,6 +103,7 @@ def get_birth_date(name: str) -> str:
         birth date of the given person
     """
     infobox_text = clean_text(get_first_infobox_text(get_page_html(name)))
+    print(infobox_text)
     pattern = r"(?:Born\D*)(?P<birth>\d{4}-\d{2}-\d{2})"
     error_text = (
         "Page infobox has no birth information (at least none in xxxx-xx-xx format)"
@@ -122,13 +123,13 @@ def get_draft_pick(name: str) -> str:
         draft pick of the given person
     """
     infobox_text = clean_text(get_first_infobox_text(get_page_html(name)))
-    pattern = r"(?:NBA draft\D*)(?P<round>\d{1})"
+    pattern = r"(?:round, (?P<draft_pick>\d+\w\w)() overall)"
     error_text = (
         "Page infobox has no draft pick information"
     )
     match = get_match(infobox_text, pattern, error_text)
 
-    return match.group("draft pick")
+    return match.group("draft_pick")
 
 
 def get_high_school(name: str) -> str:
@@ -141,13 +142,13 @@ def get_high_school(name: str) -> str:
         high school of the given person
     """
     infobox_text = clean_text(get_first_infobox_text(get_page_html(name)))
-    pattern = r"(?:(High School\(s\)|High School|High School))(?P<High School>.*?)(?College)"
+    pattern = r"(?:school\s*)(?P<high_school>(\w+\S*\s*\w*))"
     error_text = (
         "Page infobox has no high school information"
     )
     match = get_match(infobox_text, pattern, error_text)
 
-    return match.group("high school")
+    return match.group("high_school")
 
 
 def get_height(name: str) -> str:
@@ -160,7 +161,7 @@ def get_height(name: str) -> str:
         height of the given person
     """
     infobox_text = clean_text(get_first_infobox_text(get_page_html(name)))
-    pattern = r"(?:Listed Height)"
+    pattern = r"(?:height)(?P<height>\d ft\s\d+ in)"
     error_text = (
         "Page infobox has no high school information"
     )
@@ -256,7 +257,6 @@ pa_list: List[Tuple[Pattern, Action]] = [
     ("where did % go to high school".split(), high_school),
 
     ("% height".split(), height),
-    ("What is the height of %".split(), height),
 
     (["bye"], bye_action),
 ]
